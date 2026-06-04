@@ -1,0 +1,8 @@
+/* Auth specific layouts */
+#auth-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+#auth-form input:focus {
+    z-index: 20;
+}
