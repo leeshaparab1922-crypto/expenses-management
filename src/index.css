@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,7 +13,6 @@
 
 body {
   margin: 0;
-  display: flex;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -18,3 +20,50 @@ body {
 #root {
   width: 100%;
 }
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
+}
+
+.filled-icon {
+    font-variation-settings: 'FILL' 1;
+}
+
+.bento-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr 280px;
+    gap: 24px;
+}
+
+@media (max-width: 1024px) {
+    .bento-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card-shadow {
+    border: 1px solid #bfcaba; /* outline-variant */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #fcf9f8; }
+::-webkit-scrollbar-thumb { background: #bfcaba; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #707a6c; }
+
+.form-transition {
+    transition: all 0.3s ease-in-out;
+}
+
+.progress-bar-glow { box-shadow: 0 0 12px rgba(13, 99, 27, 0.1); }
+
+.safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom) + 4rem); }
+
+.glass-overlay { backdrop-filter: blur(8px); background: rgba(252, 249, 248, 0.8); }
+
+input:focus, select:focus { outline: none; border-color: #0d631b !important; }
+
+.custom-toggle:checked + .toggle-bg { background-color: #0d631b; }
+.custom-toggle:checked + .toggle-bg .toggle-dot { transform: translateX(100%); }

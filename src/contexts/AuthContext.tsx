@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Storage, User } from '../services/storage';
+import { Storage, User, UserSettings, DEFAULT_SETTINGS } from '../services/storage';
 
 interface AuthContextType {
     currentUser: User | null;
     login: (email: string, password: string) => void;
     signup: (email: string, password: string) => void;
     logout: () => void;
+    updateSettings: (settings: Partial<UserSettings>) => void;
     error: string | null;
     setError: (error: string | null) => void;
 }
@@ -42,7 +43,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             throw new Error('User already exists');
         }
         
-        const newUser = { id: Date.now(), email, password };
+        const newUser: User = { 
+            id: Date.now(), 
+            email, 
+            password,
+            settings: { ...DEFAULT_SETTINGS }
+        };
         users.push(newUser);
         Storage.saveUsers(users);
         login(email, password);
@@ -54,8 +60,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setError(null);
     };
 
+    const updateSettings = (newSettings: Partial<UserSettings>) => {
+        if (!currentUser) return;
+
+        const updatedUser: User = {
+            ...currentUser,
+            settings: { ...currentUser.settings, ...newSettings }
+        };
+
+        // Update in session
+        Storage.saveSession(updatedUser);
+        setCurrentUser(updatedUser);
+
+        // Update in users list
+        const users = Storage.getUsers();
+        const updatedUsers = users.map(u => u.id === updatedUser.id ? updatedUser : u);
+        Storage.saveUsers(updatedUsers);
+    };
+
     return (
-        <AuthContext.Provider value={{ currentUser, login, signup, logout, error, setError }}>
+        <AuthContext.Provider value={{ currentUser, login, signup, logout, updateSettings, error, setError }}>
             {children}
         </AuthContext.Provider>
     );
