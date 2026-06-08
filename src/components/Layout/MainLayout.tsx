@@ -1,24 +1,5 @@
 import React from 'react';
 import Navbar from './Navbar';
-<<<<<<< HEAD
-import BottomNav from './BottomNav';
-
-interface MainLayoutProps {
-    children: React.ReactNode;
-}
-
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
-    return (
-        <div className="bg-background text-on-surface min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-1 overflow-y-auto pb-24 md:pb-8">
-                {children}
-            </main>
-            <BottomNav />
-        </div>
-    );
-};
-=======
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="min-h-screen bg-background flex flex-col">
@@ -37,6 +18,5 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     </footer>
   </div>
 );
->>>>>>> feature/stack-upgrade
 
 export default MainLayout;

@@ -41,14 +41,20 @@ export interface Transaction {
     amount: number;
     categoryId: string;
     date: string;
-<<<<<<< HEAD
-    type: TransactionType;
-    paymentMethod: string;
-=======
     createdAt: string;
     updatedAt: string;
     type: 'expense' | 'income';
->>>>>>> feature/stack-upgrade
+}
+
+export interface Expense {
+    id: number;
+    desc: string;
+    amount: number;
+    category: string;
+    date: string;
+    createdAt: string;
+    updatedAt: string;
+    type: 'expense' | 'income';
 }
 
 export interface Budget {
@@ -110,7 +116,18 @@ export const Storage = {
         all[userId] = transactions;
         localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(all));
     },
-    
+
+    getExpenses: (userId: number): Expense[] => {
+        const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.TRANSACTIONS) || '{}');
+        return all[userId] || [];
+    },
+
+    saveExpenses: (userId: number, expenses: Expense[]) => {
+        const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.TRANSACTIONS) || '{}');
+        all[userId] = expenses;
+        localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(all));
+    },
+
     getBudgets: (userId: number): Budget[] => {
         const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.BUDGETS) || '{}');
         return all[userId] || [];
