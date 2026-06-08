@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { LOGO_BASE64 } from '../assets/logo';
+import heroIllustration from '../assets/hero-illustration.png';
 
 const Login: React.FC = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -21,27 +22,41 @@ const Login: React.FC = () => {
     const [showSignupConfirm, setShowSignupConfirm] = useState(false);
 
     const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    
-    const { login, signup } = useAuth();
+
+    const { login, signup, currentUser } = useAuth();
     const navigate = useNavigate();
+
+    // Redirect if already logged in
+    useEffect(() => {
+        if (currentUser) {
+            navigate('/dashboard');
+        }
+    }, [currentUser, navigate]);
 
     const handleTabChange = (tab: 'login' | 'signup') => {
         setIsLogin(tab === 'login');
         setError(null);
+        setSuccess(null);
     };
 
     const handleLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+        setSuccess(null);
         setLoading(true);
         try {
             const normalizedEmail = loginEmail.trim().toLowerCase();
             if (!normalizedEmail || !loginPassword) {
                 throw new Error('Please enter both email and password.');
             }
-            await login(normalizedEmail, loginPassword);
-            navigate('/dashboard');
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+                throw new Error('Please enter a valid email address (e.g. user@example.com).');
+            }
+            login(normalizedEmail, loginPassword);
+            setSuccess('Login successful! Redirecting to your dashboard...');
+            setTimeout(() => navigate('/dashboard'), 1500);
         } catch (err: any) {
             setError(err.message || 'Invalid credentials');
         } finally {
@@ -52,6 +67,7 @@ const Login: React.FC = () => {
     const handleSignupSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+        setSuccess(null);
         setLoading(true);
         try {
             const normalizedEmail = signupEmail.trim().toLowerCase();
@@ -61,16 +77,36 @@ const Login: React.FC = () => {
             if (!normalizedEmail) {
                 throw new Error('Please enter your email.');
             }
-            if (signupPassword.length < 6) {
-                throw new Error('Password must be at least 6 characters long.');
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+                throw new Error('Please enter a valid email address (e.g. user@example.com).');
+            }
+            if (signupPassword.length < 8) {
+                throw new Error('Password must be at least 8 characters long.');
+            }
+            if (!/[A-Z]/.test(signupPassword)) {
+                throw new Error('Password must contain at least one uppercase letter (A-Z).');
+            }
+            if (!/[a-z]/.test(signupPassword)) {
+                throw new Error('Password must contain at least one lowercase letter (a-z).');
+            }
+            if (!/[0-9]/.test(signupPassword)) {
+                throw new Error('Password must contain at least one number (0-9).');
+            }
+            if (!/[!@#$%^&*]/.test(signupPassword)) {
+                throw new Error('Password must contain at least one special character (!@#$%^&*).');
             }
             if (signupPassword !== signupConfirm) {
                 throw new Error('Passwords do not match.');
             }
-            await signup(normalizedEmail, signupPassword);
-            navigate('/dashboard');
+            signup(normalizedEmail, signupPassword);
+            setSuccess('Account created successfully! Welcome to SpendWise!');
+            setTimeout(() => navigate('/dashboard'), 1500);
         } catch (err: any) {
-            setError(err.message || 'Sign up failed');
+            if (err.message === 'User already exists') {
+                setError('An account with this email already exists. Please login instead.');
+            } else {
+                setError(err.message || 'Sign up failed');
+            }
         } finally {
             setLoading(false);
         }
@@ -104,10 +140,10 @@ const Login: React.FC = () => {
                         </p>
                         {/* Hero Illustration */}
                         <div className="relative w-full aspect-square max-w-[320px] mx-auto">
-                            <img 
-                                alt="Financial Illustration" 
-                                className="w-full h-full object-contain relative z-10" 
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAp_VARJQHbtEDC_icyBI2c-8s2DtyPyI7PZ2pTiDe86XIRKHDP4AXRdkuJwQJThKpu5ScHMpFRziF-hu9zdugctNRpAyaKURUSoCJENVZUgw78h6SKWXtBtO4n_CXkWEjxbTIZI7EY-yyjFBg0W8rOlm52xEeyi5hKSjxFmD9qmW8LkXH7w48ryhoCMz3U-OhKdfWCEEmIdcY8uSxtefk7WzqjluHZDtg5RH4yQtIwPK7jX4cSfYU8pbD8KqmCIrIIQ4qOIt2Z_rv3"
+                            <img
+                                alt="Financial Illustration"
+                                className="w-full h-full object-contain relative z-10"
+                                src={heroIllustration}
                             />
                             {/* Subtle background decoration */}
                             <div className="absolute inset-0 bg-primary/5 rounded-full scale-125 blur-3xl -z-0"></div>
@@ -146,11 +182,30 @@ const Login: React.FC = () => {
 
                         {/* Form Container */}
                         <div className="p-gutter md:p-12 flex-1">
+                            {/* Success Banner */}
+                            {success && (
+                                <div className="mb-6 p-4 bg-green-100 text-green-800 rounded-lg border border-green-300 text-body-sm flex items-start gap-2 animate-fade-in">
+                                    <span className="material-symbols-outlined text-[20px] text-green-600">check_circle</span>
+                                    <span>{success}</span>
+                                </div>
+                            )}
+
                             {/* Error Alert Panel */}
                             {error && (
                                 <div className="mb-6 p-4 bg-error-container text-on-error-container rounded-lg border border-error/20 text-body-sm flex items-start gap-2 animate-fade-in">
                                     <span className="material-symbols-outlined text-[20px] text-error">error</span>
-                                    <span>{error}</span>
+                                    <div className="flex flex-col gap-1">
+                                        <span>{error}</span>
+                                        {error.includes('already exists') && (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleTabChange('login')}
+                                                className="text-primary underline text-left font-semibold hover:opacity-80"
+                                            >
+                                                Go to Login →
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             )}
 
