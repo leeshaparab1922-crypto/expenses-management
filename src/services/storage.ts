@@ -41,8 +41,14 @@ export interface Transaction {
     amount: number;
     categoryId: string;
     date: string;
+<<<<<<< HEAD
     type: TransactionType;
     paymentMethod: string;
+=======
+    createdAt: string;
+    updatedAt: string;
+    type: 'expense' | 'income';
+>>>>>>> feature/stack-upgrade
 }
 
 export interface Budget {

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState } from 'react';
 import MainLayout from '../components/Layout/MainLayout';
 import { useAuth } from '../contexts/AuthContext';
@@ -237,6 +238,12 @@ const Profile: React.FC = () => {
             </div>
         </MainLayout>
     );
+=======
+import React from 'react';
+
+const Profile: React.FC = () => {
+  return <div>Profile Page Placeholder</div>;
+>>>>>>> feature/stack-upgrade
 };
 
 export default Profile;

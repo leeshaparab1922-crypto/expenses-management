@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { Storage, Budget } from '../services/storage';
 import { useAuth } from './AuthContext';
 
@@ -8,11 +9,23 @@ interface BudgetContextType {
     updateBudget: (id: string, limit: number) => void;
     deleteBudget: (id: string) => void;
     getBudgetForCategory: (categoryId: string, month: string) => Budget | undefined;
+=======
+import { Budget } from '../services/budgetService';
+import { budgetService } from '../services/budgetService';
+
+interface BudgetContextType {
+    budgets: Budget[];
+    createBudget: (budget: Omit<Budget, 'id'>) => void;
+    updateBudget: (budget: Budget) => void;
+    deleteBudget: (id: number) => void;
+    refreshBudgets: () => void;
+>>>>>>> feature/stack-upgrade
 }
 
 const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
 
 export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+<<<<<<< HEAD
     const { currentUser } = useAuth();
     const [budgets, setBudgets] = useState<Budget[]>([]);
 
@@ -65,6 +78,35 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     return (
         <BudgetContext.Provider value={{ budgets, addBudget, updateBudget, deleteBudget, getBudgetForCategory }}>
+=======
+    const [budgets, setBudgets] = useState<Budget[]>([]);
+
+    const refreshBudgets = () => {
+        setBudgets(budgetService.getAllBudgets());
+    };
+
+    useEffect(() => {
+        refreshBudgets();
+    }, []);
+
+    const createBudget = (budgetData: Omit<Budget, 'id'>) => {
+        budgetService.createBudget(budgetData);
+        refreshBudgets();
+    };
+
+    const updateBudget = (budget: Budget) => {
+        budgetService.updateBudget(budget);
+        refreshBudgets();
+    };
+
+    const deleteBudget = (id: number) => {
+        budgetService.deleteBudget(id);
+        refreshBudgets();
+    };
+
+    return (
+        <BudgetContext.Provider value={{ budgets, createBudget, updateBudget, deleteBudget, refreshBudgets }}>
+>>>>>>> feature/stack-upgrade
             {children}
         </BudgetContext.Provider>
     );
@@ -73,7 +115,11 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 export const useBudgets = () => {
     const context = useContext(BudgetContext);
     if (context === undefined) {
+<<<<<<< HEAD
         throw new Error('useBudgets must be used within a BudgetProvider');
+=======
+        throw new Error('useBudgets must be used within an BudgetProvider');
+>>>>>>> feature/stack-upgrade
     }
     return context;
 };
