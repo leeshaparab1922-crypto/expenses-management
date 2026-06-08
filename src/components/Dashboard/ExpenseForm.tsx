@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useExpenses } from '../../contexts/ExpenseContext';
 
 const ExpenseForm: React.FC = () => {
-    const { addExpense } = useExpenses();
+    const { createExpense } = useExpenses();
     const [desc, setDesc] = useState('');
     const [amount, setAmount] = useState('');
     const [category, setCategory] = useState('Food');
@@ -10,11 +10,14 @@ const ExpenseForm: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        addExpense({
+        createExpense({
             desc,
             amount: parseFloat(amount),
             category,
-            date
+            date,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            type: 'expense'
         });
         setDesc('');
         setAmount('');

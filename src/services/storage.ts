@@ -21,6 +21,9 @@ export interface Expense {
     amount: number;
     category: string;
     date: string;
+    createdAt: string;
+    updatedAt: string;
+    type: 'expense' | 'income';
 }
 
 export const Storage = {
