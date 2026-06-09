@@ -15,7 +15,8 @@ import Reports from './pages/Reports'
 import Transaction from './pages/Transaction'
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { currentUser } = useAuth()
+  const { currentUser, authLoading } = useAuth()
+  if (authLoading) return null
   if (!currentUser) {
     return <Navigate to="/login" />
   }

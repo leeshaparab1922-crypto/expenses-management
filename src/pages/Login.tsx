@@ -22,6 +22,7 @@ const Login: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
 
     const { login, signup, currentUser } = useAuth();
     const navigate = useNavigate();
@@ -51,7 +52,7 @@ const Login: React.FC = () => {
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
                 throw new Error('Please enter a valid email address (e.g. user@example.com).');
             }
-            login(normalizedEmail, loginPassword);
+            await login(normalizedEmail, loginPassword);
             setSuccess('Login successful! Redirecting to your dashboard...');
             setTimeout(() => navigate('/dashboard'), 1500);
         } catch (err: any) {
@@ -95,9 +96,13 @@ const Login: React.FC = () => {
             if (signupPassword !== signupConfirm) {
                 throw new Error('Passwords do not match.');
             }
-            signup(normalizedEmail, signupPassword);
-            setSuccess('Account created successfully! Welcome to SpendWise!');
-            setTimeout(() => navigate('/dashboard'), 1500);
+            const { requiresVerification } = await signup(normalizedEmail, signupPassword);
+            if (requiresVerification) {
+                setVerificationEmail(normalizedEmail);
+            } else {
+                setSuccess('Account created successfully! Welcome to SpendWise!');
+                setTimeout(() => navigate('/dashboard'), 1500);
+            }
         } catch (err: any) {
             if (err.message === 'User already exists') {
                 setError('An account with this email already exists. Please login instead.');
@@ -108,6 +113,45 @@ const Login: React.FC = () => {
             setLoading(false);
         }
     };
+
+    if (verificationEmail) {
+        return (
+            <div className="min-h-screen w-full flex items-center justify-center bg-[#E8F5E9] px-4">
+                <div className="w-full max-w-md bg-surface rounded-3xl shadow-xl border border-outline-variant p-10 flex flex-col items-center text-center gap-6">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
+                        <span className="material-symbols-outlined text-[40px] text-primary">mark_email_unread</span>
+                    </div>
+                    <div>
+                        <h2 className="font-headline-md text-headline-md text-on-surface font-bold mb-2">Check your email</h2>
+                        <p className="font-body-md text-on-surface-variant">
+                            We sent a verification link to
+                        </p>
+                        <p className="font-label-lg text-primary font-semibold mt-1 break-all">{verificationEmail}</p>
+                        <p className="font-body-md text-on-surface-variant mt-3">
+                            Click the link in the email to activate your account. You can close this tab.
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => { setVerificationEmail(null); setIsLogin(true); }}
+                        className="w-full h-12 bg-primary-container text-on-primary-container hover:bg-primary hover:text-white transition-all rounded-lg font-label-md font-bold cursor-pointer"
+                    >
+                        Back to Login
+                    </button>
+                    <p className="font-body-sm text-on-surface-variant text-xs">
+                        Didn't receive it? Check your spam folder or{' '}
+                        <button
+                            type="button"
+                            onClick={() => setVerificationEmail(null)}
+                            className="text-primary underline font-semibold"
+                        >
+                            try a different email
+                        </button>.
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen w-full flex flex-col md:flex-row bg-background font-body-lg text-on-background overflow-x-hidden">
