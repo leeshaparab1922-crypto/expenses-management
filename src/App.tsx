@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { ExpenseProvider } from './contexts/ExpenseContext'
 import { BudgetProvider } from './contexts/BudgetContext'
 import { CategoryProvider } from './contexts/CategoryContext'
+import { BillProvider } from './contexts/BillContext'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import MainLayout from './components/Layout/MainLayout'
@@ -29,6 +30,7 @@ const App: React.FC = () => {
       <ExpenseProvider>
         <BudgetProvider>
           <CategoryProvider>
+            <BillProvider>
             <Router>
               <Routes>
                 <Route path="/login" element={<Login />} />
@@ -91,6 +93,7 @@ const App: React.FC = () => {
                 <Route path="/" element={<Navigate to="/dashboard" />} />
               </Routes>
             </Router>
+            </BillProvider>
           </CategoryProvider>
         </BudgetProvider>
       </ExpenseProvider>

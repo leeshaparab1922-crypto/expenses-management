@@ -8,6 +8,7 @@ const STORAGE_KEYS = {
     TRANSACTIONS: 'et_expenses', // Kept key for compatibility but renamed internal interface
     BUDGETS: 'et_budgets',
     CATEGORIES: 'et_categories',
+    BILLS: 'et_bills',
     SESSION: 'et_session'
 };
 
@@ -70,6 +71,14 @@ export interface Category {
     icon: string;
     type: TransactionType;
     isDefault: boolean;
+}
+
+export interface Bill {
+    id: number;
+    name: string;
+    amount: number;
+    dueDay: number; // 1–31, day of month (monthly recurring)
+    icon: string;
 }
 
 export const DEFAULT_CATEGORIES: Category[] = [
@@ -151,6 +160,17 @@ export const Storage = {
         localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(all));
     },
     
+    getBills: (userId: number): Bill[] => {
+        const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.BILLS) || '{}');
+        return all[userId] || [];
+    },
+
+    saveBills: (userId: number, bills: Bill[]) => {
+        const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.BILLS) || '{}');
+        all[userId] = bills;
+        localStorage.setItem(STORAGE_KEYS.BILLS, JSON.stringify(all));
+    },
+
     getSession: (): User | null => JSON.parse(localStorage.getItem(STORAGE_KEYS.SESSION) || 'null'),
     
     saveSession: (user: User) => localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(user)),
