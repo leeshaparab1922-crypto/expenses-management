@@ -1,36 +1,34 @@
-export interface Category {
-    id: number;
-    name: string;
-    icon: string;
-    color: string;
-}
-
-const STORAGE_KEY = 'et_categories';
+import { Storage, Category } from './storage';
 
 export const categoryService = {
-    getAllCategories: (): Category[] => {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    getAllCategories: (userId: number): Category[] => {
+        return Storage.getCategories(userId);
     },
     
-    getCategoryById: (id: number): Category | undefined => {
-        return categoryService.getAllCategories().find(c => c.id === id);
+    getCategoryById: (userId: number, id: string | number): Category | undefined => {
+        return categoryService.getAllCategories(userId).find(c => c.id === id);
     },
     
-    createCategory: (category: Omit<Category, 'id'>): Category => {
-        const categories = categoryService.getAllCategories();
+    createCategory: (userId: number, category: Omit<Category, 'id'>): Category => {
+        const categories = Storage.getCategories(userId);
+        const customOnly = categories.filter(c => !c.isDefault);
         const newCategory: Category = { ...category, id: Date.now() };
-        categories.push(newCategory);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(categories));
+        customOnly.push(newCategory);
+        Storage.saveCustomCategories(userId, customOnly);
         return newCategory;
     },
     
-    updateCategory: (updatedCategory: Category): void => {
-        const categories = categoryService.getAllCategories();
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(categories.map(c => c.id === updatedCategory.id ? updatedCategory : c)));
+    updateCategory: (userId: number, updatedCategory: Category): void => {
+        const categories = Storage.getCategories(userId);
+        const customOnly = categories.filter(c => !c.isDefault);
+        const updatedCustom = customOnly.map(c => c.id === updatedCategory.id ? updatedCategory : c);
+        Storage.saveCustomCategories(userId, updatedCustom);
     },
     
-    deleteCategory: (id: number): void => {
-        const categories = categoryService.getAllCategories();
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(categories.filter(c => c.id !== id)));
+    deleteCategory: (userId: number, id: string | number): void => {
+        const categories = Storage.getCategories(userId);
+        const customOnly = categories.filter(c => !c.isDefault);
+        const filteredCustom = customOnly.filter(c => c.id !== id);
+        Storage.saveCustomCategories(userId, filteredCustom);
     }
 };

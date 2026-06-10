@@ -66,11 +66,12 @@ export interface Budget {
 }
 
 export interface Category {
-    id: string;
+    id: string | number;
     name: string;
     icon: string;
-    type: TransactionType;
-    isDefault: boolean;
+    type?: TransactionType;
+    isDefault?: boolean;
+    color?: string;
 }
 
 export interface Bill {
@@ -82,17 +83,17 @@ export interface Bill {
 }
 
 export const DEFAULT_CATEGORIES: Category[] = [
-    { id: 'food', name: 'Food', icon: 'restaurant', type: 'expense', isDefault: true },
-    { id: 'transport', name: 'Transport', icon: 'commute', type: 'expense', isDefault: true },
-    { id: 'rent', name: 'Rent', icon: 'home', type: 'expense', isDefault: true },
-    { id: 'health', name: 'Health', icon: 'medical_services', type: 'expense', isDefault: true },
-    { id: 'entertainment', name: 'Entertainment', icon: 'movie', type: 'expense', isDefault: true },
-    { id: 'education', name: 'Education', icon: 'school', type: 'expense', isDefault: true },
-    { id: 'shopping', name: 'Shopping', icon: 'shopping_bag', type: 'expense', isDefault: true },
-    { id: 'utilities', name: 'Utilities', icon: 'bolt', type: 'expense', isDefault: true },
-    { id: 'travel', name: 'Travel', icon: 'flight', type: 'expense', isDefault: true },
-    { id: 'salary', name: 'Salary', icon: 'work', type: 'income', isDefault: true },
-    { id: 'others', name: 'Others', icon: 'box', type: 'expense', isDefault: true },
+    { id: 'food', name: 'Food', icon: 'restaurant', type: 'expense', isDefault: true, color: '#FF9800' },
+    { id: 'transport', name: 'Transport', icon: 'commute', type: 'expense', isDefault: true, color: '#2196F3' },
+    { id: 'rent', name: 'Rent', icon: 'home', type: 'expense', isDefault: true, color: '#795548' },
+    { id: 'health', name: 'Health', icon: 'medical_services', type: 'expense', isDefault: true, color: '#F44336' },
+    { id: 'entertainment', name: 'Entertainment', icon: 'movie', type: 'expense', isDefault: true, color: '#9C27B0' },
+    { id: 'education', name: 'Education', icon: 'school', type: 'expense', isDefault: true, color: '#3F51B5' },
+    { id: 'shopping', name: 'Shopping', icon: 'shopping_bag', type: 'expense', isDefault: true, color: '#E91E63' },
+    { id: 'utilities', name: 'Utilities', icon: 'bolt', type: 'expense', isDefault: true, color: '#FFEB3B' },
+    { id: 'travel', name: 'Travel', icon: 'flight', type: 'expense', isDefault: true, color: '#00BCD4' },
+    { id: 'salary', name: 'Salary', icon: 'work', type: 'income', isDefault: true, color: '#4CAF50' },
+    { id: 'others', name: 'Others', icon: 'box', type: 'expense', isDefault: true, color: '#607D8B' },
 ];
 
 export const DEFAULT_SETTINGS: UserSettings = {
@@ -150,8 +151,26 @@ export const Storage = {
 
     getCategories: (userId: number): Category[] => {
         const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.CATEGORIES) || '{}');
+        
+        // Handle backward compatibility where et_categories might be a flat array (from previous broken implementation)
+        const storedValue = localStorage.getItem(STORAGE_KEYS.CATEGORIES);
+        if (storedValue && storedValue.startsWith('[')) {
+            const flatArray = JSON.parse(storedValue) as Category[];
+            // Convert to new format
+            const migrated = { [userId]: flatArray };
+            localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(migrated));
+            return [...DEFAULT_CATEGORIES, ...flatArray];
+        }
+
         const custom = all[userId] || [];
-        return [...DEFAULT_CATEGORIES, ...custom];
+        // Ensure no duplicates by name
+        const combined = [...DEFAULT_CATEGORIES];
+        custom.forEach((c: Category) => {
+            if (!combined.some(existing => existing.name.toLowerCase() === c.name.toLowerCase())) {
+                combined.push(c);
+            }
+        });
+        return combined;
     },
 
     saveCustomCategories: (userId: number, customCategories: Category[]) => {
