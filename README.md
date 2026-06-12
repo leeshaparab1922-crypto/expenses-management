@@ -6,8 +6,13 @@ A modern, full-stack personal finance management application built with React, T
 
 The Personal Expense Tracker is designed to simplify financial management. It provides a comprehensive dashboard for monitoring spending habits, managing transactions, tracking budgets, and analyzing financial trends through intuitive charts and reports.
 
-### Key Problem Solved
-Manual entry of expenses can be tedious. This app leverages AI to allow users to simply type or say what they spent (e.g., "Spent $45 on groceries today"), and the system automatically extracts the amount, category, and date.
+### AI-Powered Intelligence
+Manual entry of expenses is replaced by a sophisticated AI-driven architecture:
+- **Gemini Integration:** Leverages the Google Generative AI SDK to interface with Gemini Pro models directly from the frontend service layer.
+- **Smart Parsing:** Processes natural language via specialized prompt engineering to transform unstructured text into validated JSON objects.
+- **Dedicated Service Layer:** Orchestrates API calls through `geminiService.ts` to ensure metadata extraction and strict data type safety.
+- **"No-Forms" Experience:** Achieves a seamless user workflow by offloading complex transaction parsing to the LLM.
+- **Structural Integrity:** Enforces custom validation logic to align extracted entities with specific financial categories and regional formats.
 
 ## Features
 
