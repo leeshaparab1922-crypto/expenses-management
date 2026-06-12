@@ -21,6 +21,22 @@ Manual entry of expenses can be tedious. This app leverages AI to allow users to
 - **Data Persistence:** Real-time data synchronization and storage with Supabase.
 - **Analytics & Reports:** Detailed breakdown of spending by category and over time.
 
+## Screenshots
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### Expense Management
+![Expense Management](screenshots/expenses.png)
+
+### Reports
+![Reports](screenshots/reports.png)
+
+### Budget Tracking
+![Budget Tracking](screenshots/budget.png)
+
+
+
 ## Tech Stack
 
 | Area | Technology |
